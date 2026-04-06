@@ -1,1 +1,45 @@
-(api/index.py)
+# --- PHELPS TUCKER GROUP - TECNOLOGÍA PROPIETARIA ---
+# Proyecto: NEURAL FACTORY X
+# Autor: Registrador Gustavo Sanabria
+# Estatus: DESPLIEGUE IAL2-CERTIFIED
+
+from flask import Flask, request, jsonify
+import google.generativeai as genai
+import os
+
+app = Flask(__name__)
+
+# Configuración del Motor Neural
+# Nota: La GEMINI_API_KEY se configura en el panel de Vercel
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+model = genai.GenerativeModel('gemini-1.5-pro')
+
+@app.route('/')
+def home():
+    return "🏛️ NEURAL FACTORY X: MOTOR DE GENERACIÓN ACTIVO - PTG"
+
+@app.route('/fabricar', methods=['POST'])
+def fabricar():
+    data = request.json
+    demanda = data.get("requerimiento", "Lógica Binaria Estándar")
+    
+    prompt = f"""
+    Eres el núcleo de inteligencia del Phelps Tucker Group.
+    REQUERIMIENTO: {demanda}
+    TAREA: Entrega una arquitectura de solución binaria (0/1).
+    FIRMA: Registrador Sanabria - Terminal X.
+    """
+    
+    try:
+        response = model.generate_content(prompt)
+        return jsonify({
+            "status": "ORDEN EJECUTADA",
+            "veracidad": "IAL2",
+            "resultado": response.text,
+            "hash": "0x19D59889A11AF911"
+        })
+    except Exception as e:
+        return jsonify({"status": "LATENCIA", "error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run()
